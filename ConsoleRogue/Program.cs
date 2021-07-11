@@ -77,6 +77,7 @@ namespace ConsoleRogue
             RLConsole.Blit(inventoryConsole, 0, 0, inventoryWidth, inventoryHeight, rootConsole, 0, 0);
             tileset.Draw(mapConsole);
             rootConsole.Draw();
+            // There is now a change
         }
     }
 }
