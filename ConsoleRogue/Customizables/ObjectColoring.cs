@@ -23,5 +23,7 @@ namespace ConsoleRogue.Customizables
         public static RLColor wallInvisible = Pallete.PrimaryDark;
         public static RLColor floorInvisible = Pallete.SecondaryDark;
 
+        public static RLColor player = Pallete.Complementary;
+
     }
 }

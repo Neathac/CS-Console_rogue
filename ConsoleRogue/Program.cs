@@ -1,4 +1,5 @@
-﻿using ConsoleRogue.Components.Map;
+﻿using ConsoleRogue.Components.Actors;
+using ConsoleRogue.Components.Map;
 using ConsoleRogue.Customizables;
 using RLNET;
 using System;
@@ -32,9 +33,13 @@ namespace ConsoleRogue
         private static readonly int inventoryHeight = 11;
         private static RLConsole inventoryConsole;
 
-        public static Tileset tileset { get; private set; }
+        public static Tileset tileset { get; set; }
+
+        public static Player player { get; set; }
         static void Main(string[] args)
         {
+            player = new Player();
+
             string fontFile = "terminal8x8.png";
             string screenName = "Test";
 
@@ -67,6 +72,8 @@ namespace ConsoleRogue
 
             inventoryConsole.SetBackColor(0, 0, inventoryWidth, inventoryHeight, ObjectColoring.inventoryColor);
             inventoryConsole.Print(1, 1, "Inventory", ObjectColoring.textColor);
+
+            tileset.updatePlayerVisibility();
         }
 
         private static void onRootConsoleRender( object sender, UpdateEventArgs e)
@@ -76,8 +83,8 @@ namespace ConsoleRogue
             RLConsole.Blit(messageConsole, 0, 0, messageWidth, messageHeight, rootConsole, 0, screenHeigth - messageHeight);
             RLConsole.Blit(inventoryConsole, 0, 0, inventoryWidth, inventoryHeight, rootConsole, 0, 0);
             tileset.Draw(mapConsole);
+            player.Draw( mapConsole, tileset );
             rootConsole.Draw();
-            // There is now a change
         }
     }
 }
