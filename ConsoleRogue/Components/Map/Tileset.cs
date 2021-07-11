@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ConsoleRogue.Components.Actors;
 using ConsoleRogue.Customizables;
 using RLNET;
 using RogueSharp;
@@ -9,8 +10,8 @@ namespace ConsoleRogue.Components.Map
 {
     class Tileset : RogueSharp.Map
     {
-        private char unpassable = '#';
-        private char passable = '.';
+        public static char unpassable = '#';
+        public static char passable = '.';
 
         public void Draw( RLConsole mapConsole )
         {
@@ -53,5 +54,18 @@ namespace ConsoleRogue.Components.Map
                 }
             }
         }
+
+        public void updatePlayerVisibility()
+        {
+            Player player = Program.player; // TODO - Create a class holding all game agents that need to be accessed directly. Driver code shouldn't hold them
+            ComputeFov(player.xCoor, player.yCoor, player.perception, true);
+            foreach( Cell cell in GetAllCells())
+            {
+                if( IsInFov( cell.X, cell.Y))
+                {
+                    SetCellProperties(cell.X, cell.Y, cell.IsTransparent, cell.IsWalkable, true);
+                }
+            }
+         }
     }
 }
