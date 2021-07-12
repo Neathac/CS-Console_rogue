@@ -1,4 +1,5 @@
 ﻿using ConsoleRogue.Components.Actors;
+using ConsoleRogue.Components.Drivers;
 using ConsoleRogue.Components.Map;
 using ConsoleRogue.Customizables;
 using RLNET;
@@ -32,10 +33,13 @@ namespace ConsoleRogue
         private static readonly int inventoryWidth = 80;
         private static readonly int inventoryHeight = 11;
         private static RLConsole inventoryConsole;
+        private static bool reRender = true;
 
         public static Tileset tileset { get; set; }
 
         public static Player player { get; set; }
+
+        public static MovementDriver moveDrive { get; set; }
         static void Main(string[] args)
         {
             player = new Player();
@@ -56,12 +60,6 @@ namespace ConsoleRogue
             Generator generator = new Generator( mapWidth, mapHeight );
             tileset = generator.generateMap();
 
-            rootConsole.Run();
-        }
-
-        private static void onRootConsoleUpdate( object sender, UpdateEventArgs e)
-        {
-            rootConsole.Print(10, 10, "Tester", RLColor.White);
             mapConsole.SetBackColor(0, 0, mapWidth, mapHeight, ObjectColoring.background);
 
             messageConsole.SetBackColor(0, 0, messageWidth, messageHeight, ObjectColoring.messageColor);
@@ -73,18 +71,42 @@ namespace ConsoleRogue
             inventoryConsole.SetBackColor(0, 0, inventoryWidth, inventoryHeight, ObjectColoring.inventoryColor);
             inventoryConsole.Print(1, 1, "Inventory", ObjectColoring.textColor);
 
-            tileset.updatePlayerVisibility();
+            moveDrive = new MovementDriver();
+
+            rootConsole.Run();
+        }
+
+        private static void onRootConsoleUpdate( object sender, UpdateEventArgs e)
+        {
+            RLKeyPress key = rootConsole.Keyboard.GetKeyPress();
+            if( key != null)
+            {
+                if(key.Key != RLKey.Escape)
+                {
+                    reRender = moveDrive.mapKeyToDir( player, key);
+                }
+                else
+                {
+                    rootConsole.Close();
+                }
+            }
+            tileset.updatePlayerVisibility( player );
         }
 
         private static void onRootConsoleRender( object sender, UpdateEventArgs e)
         {
-            RLConsole.Blit(mapConsole, 0, 0, mapWidth, mapHeight, rootConsole, 0, inventoryHeight);
-            RLConsole.Blit(statConsole, 0, 0, statWidth, statHeight, rootConsole, mapWidth, 0);
-            RLConsole.Blit(messageConsole, 0, 0, messageWidth, messageHeight, rootConsole, 0, screenHeigth - messageHeight);
-            RLConsole.Blit(inventoryConsole, 0, 0, inventoryWidth, inventoryHeight, rootConsole, 0, 0);
-            tileset.Draw(mapConsole);
-            player.Draw( mapConsole, tileset );
-            rootConsole.Draw();
+            if (reRender)
+            {
+                tileset.Draw(mapConsole);
+                player.Draw( mapConsole, tileset );
+                RLConsole.Blit(mapConsole, 0, 0, mapWidth, mapHeight, rootConsole, 0, inventoryHeight);
+                RLConsole.Blit(statConsole, 0, 0, statWidth, statHeight, rootConsole, mapWidth, 0);
+                RLConsole.Blit(messageConsole, 0, 0, messageWidth, messageHeight, rootConsole, 0, screenHeigth - messageHeight);
+                RLConsole.Blit(inventoryConsole, 0, 0, inventoryWidth, inventoryHeight, rootConsole, 0, 0);
+                
+                rootConsole.Draw();
+                reRender = false;
+            }            
         }
     }
 }

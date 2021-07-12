@@ -55,9 +55,8 @@ namespace ConsoleRogue.Components.Map
             }
         }
 
-        public void updatePlayerVisibility()
+        public void updatePlayerVisibility( Player player )
         {
-            Player player = Program.player; // TODO - Create a class holding all game agents that need to be accessed directly. Driver code shouldn't hold them
             ComputeFov(player.xCoor, player.yCoor, player.perception, true);
             foreach( Cell cell in GetAllCells())
             {
@@ -67,5 +66,34 @@ namespace ConsoleRogue.Components.Map
                 }
             }
          }
+
+        public bool newActorPosition( Actor actor, int xCoor, int yCoor )
+        {
+            // Get the cell we want to move the actor to
+            ICell targetCell = GetCell( xCoor, yCoor);
+            // If we are able to move the actor there:
+            if (targetCell.IsWalkable)
+            {
+                // Get the cell actor is currently on
+                ICell currentCell = GetCell( actor.xCoor, actor.yCoor );
+                // If current actor is standing on our cell, it is unwalkable, so we have to make it walkable again
+                // Could be an interesting mechanic - consider and try
+                SetCellProperties( currentCell.X, currentCell.Y, currentCell.IsTransparent, true, currentCell.IsExplored );
+                // Moving the actor
+                actor.xCoor = xCoor;
+                actor.yCoor = yCoor;
+                // New position is now unwalkable, because our actor is now standing there
+                SetCellProperties(targetCell.X, targetCell.Y, targetCell.IsTransparent, false, currentCell.IsExplored);
+                
+                // Can't think of a better place to update player FoV
+                if ( actor is Player )
+                {
+                    updatePlayerVisibility(actor as Player);
+                }
+                return true;
+            }
+
+            return false;
+        }
     }
 }
