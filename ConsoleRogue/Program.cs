@@ -57,8 +57,10 @@ namespace ConsoleRogue
             statConsole = new RLConsole(statWidth, statHeight);
             inventoryConsole = new RLConsole(inventoryWidth, inventoryHeight);
 
-            Generator generator = new Generator( mapWidth, mapHeight );
-            tileset = generator.generateMap();
+            Generator generator = new Generator( mapWidth, mapHeight, 5, 15 );
+            int numSeed = Environment.TickCount;
+            Random seed = new Random(numSeed);
+            tileset = generator.generateMap(seed);
 
             mapConsole.SetBackColor(0, 0, mapWidth, mapHeight, ObjectColoring.background);
 

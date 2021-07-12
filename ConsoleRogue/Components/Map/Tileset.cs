@@ -94,6 +94,6 @@ namespace ConsoleRogue.Components.Map
             }
 
             return false;
-        }
+        }       
     }
 }
