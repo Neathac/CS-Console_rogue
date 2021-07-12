@@ -27,23 +27,24 @@ namespace ConsoleRogue.Components.Map
 
         public Tileset generateMap( Random seed )
         {
+            bool placedPlayer = false;
             rooms.Clear();
             // RogueSharp Initialize
             tileset.Initialize( width, height );
 
             foreach( Cell cell in tileset.GetAllCells())
             {
-                tileset.SetCellProperties( cell.X, cell.Y, true, true, true);
+                tileset.SetCellProperties( cell.X, cell.Y, true, true, false);
             }
 
             foreach ( Cell cell in tileset.GetCellsInColumns(0, width -1) )
             {
-                tileset.SetCellProperties(cell.X, cell.Y, false, false, true);
+                tileset.SetCellProperties(cell.X, cell.Y, false, false, false);
             }
 
             foreach (Cell cell in tileset.GetCellsInRows(0, height - 1))
             {
-                tileset.SetCellProperties(cell.X, cell.Y, false, false, true);
+                tileset.SetCellProperties(cell.X, cell.Y, false, false, false);
             }
 
             int roomsAmount = seed.Next(minRooms, maxRooms);
@@ -54,6 +55,11 @@ namespace ConsoleRogue.Components.Map
                 {
                     rooms.Add(currRoom);
                     createRoom(currRoom);
+                    if (!placedPlayer)
+                    {
+                        Program.player.setStart(currRoom.centerX, currRoom.centerY);
+                        placedPlayer = true;
+                    }
                 }
                 else
                 {
