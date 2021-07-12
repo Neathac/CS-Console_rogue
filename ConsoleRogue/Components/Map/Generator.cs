@@ -1,4 +1,5 @@
-﻿using RogueSharp;
+﻿using ConsoleRogue.Misc_Globals;
+using RogueSharp;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -50,7 +51,7 @@ namespace ConsoleRogue.Components.Map
             int roomsAmount = seed.Next(minRooms, maxRooms);
             for (int i = 0; i < roomsAmount; ++i)
             {
-                Room currRoom = new Room(seed.Next(0, width), seed.Next(0, height), seed.Next(minRooms, maxRooms), seed.Next(minRooms, maxRooms));
+                Room currRoom = new Room(seed.Next(0, width-10), seed.Next(0, height-5), seed.Next(minRooms, maxRooms), seed.Next(minRooms, maxRooms));
                 if (isValid(currRoom))
                 {
                     rooms.Add(currRoom);
@@ -66,8 +67,113 @@ namespace ConsoleRogue.Components.Map
                     i -= 1;
                 }
             }
+            connectAllRooms(rooms);
 
             return tileset;
+        }
+
+        private void connectAllRooms(List<Room> rooms)
+        {
+            for(int i = 0; i < rooms.Count; ++i)
+            {
+                for (int j = i+1; j < rooms.Count; ++j)
+                {
+                    connectTwoRooms(rooms[i], rooms[j], getRelativeDirs(new int[] { rooms[i].centerX, rooms[i].centerY }, new int[] { rooms[j].centerX, rooms[j].centerY }));
+                }
+            }
+        }
+
+        private void connectTwoRooms(Room room1, Room room2, MovementDirs relDirs)
+        {
+            switch (relDirs)
+            {
+                case MovementDirs.Down:
+                    digTunnel(new int[] { room1.centerX, room1.centerY }, new int[] { -1, room2.centerY}, new int[] { 0, 1});
+                    break;
+                case MovementDirs.Top:
+                    digTunnel(new int[] { room1.centerX, room1.centerY }, new int[] { -1, room2.centerY }, new int[] { 0, -1 });
+                    break;
+                case MovementDirs.Left:
+                    digTunnel(new int[] { room1.centerX, room1.centerY }, new int[] { room2.centerX, -1 }, new int[] { -1, 0 });
+                    break;
+                case MovementDirs.Right:
+                    digTunnel(new int[] { room1.centerX, room1.centerY }, new int[] { room2.centerX, -1 }, new int[] { 1, 0 });
+                    break;
+            }
+        }
+
+        private void digTunnel(int[] start, int[] limit, int[] motion)
+        {
+            int[] walloffDir = { 1-Math.Abs(motion[0]), 1 - Math.Abs(motion[1]) };
+            bool digging = false;
+            while (start[0] != limit[0] && start[1] != limit[1])
+            {
+                if(tileset.GetCell(start[0]+motion[0], start[1] + motion[1]).IsWalkable && digging) // Just broke into a walkable chamber
+                {
+                    digging = false;
+                }
+                else if (!tileset.GetCell(start[0] + motion[0], start[1] + motion[1]).IsWalkable && !digging) // Just found a wall
+                {
+                    digging = true;
+                }
+                start[0] += motion[0];
+                start[1] += motion[1];
+                if (digging)
+                {
+                    tileset.SetCellProperties(start[0], start[1], true, true, true);
+                    tileset.SetCellProperties(start[0]+walloffDir[0], start[1] + walloffDir[1], true, false, true);
+                    tileset.SetCellProperties(start[0] - walloffDir[0], start[1] - walloffDir[1], true, false, true);
+                }
+            }
+        }
+
+        private MovementDirs getRelativeDirs(int[] x, int[] y)
+        {
+            if (x[0] > y[0]) // x is to the right of y
+            {
+                if (x[1] > y[1]) // x is below y
+                {
+                    return MovementDirs.DownRight;
+                }
+                else if (x[1] == y[1]) // x is on the same vertical line as y
+                {
+                    return MovementDirs.Right;
+                }
+                else // x is above y
+                {
+                    return MovementDirs.TopRight;
+                }
+            }
+            else if (x[0] == y[0]) // x and y are on the same horizontal level
+            {
+                if (x[1] > y[1]) // x is below y
+                {
+                    return MovementDirs.Down;
+                }
+                else if (x[1] == y[1]) // x is on the same vertical line as y
+                {
+                    return MovementDirs.InPlace;
+                }
+                else // x is above y
+                {
+                    return MovementDirs.Top;
+                }
+            }
+            else // x is to the left of y
+            {
+                if (x[1] > y[1]) // x is below y
+                {
+                    return MovementDirs.DownLeft;
+                }
+                else if (x[1] == y[1]) // x is on the same vertical line as y
+                {
+                    return MovementDirs.Left;
+                }
+                else // x is above y
+                {
+                    return MovementDirs.TopRight;
+                }
+            }
         }
 
         private void createRoom(Room room)
