@@ -60,7 +60,7 @@ namespace ConsoleRogue
             statConsole = new RLConsole(statWidth, statHeight);
             inventoryConsole = new RLConsole(inventoryWidth, inventoryHeight);
 
-            Generator generator = new Generator( mapWidth, mapHeight, 8, 17 );
+            Generator generator = new Generator( mapWidth, mapHeight, 8, 25 );
             int numSeed = Environment.TickCount;
             Random seed = new Random(numSeed);
             tileset = generator.generateMap(seed);
@@ -69,8 +69,8 @@ namespace ConsoleRogue
 
             messageConsole.SetBackColor(0, 0, messageWidth, messageHeight, ObjectColoring.messageColor);
 
-            statConsole.SetBackColor(0, 0, statWidth, statHeight, ObjectColoring.statsColor);
-            statConsole.Print(1, 1, "Stats", ObjectColoring.textColor);
+            player.drawStats(statConsole);
+            statConsole.SetBackColor(0, 0, statWidth, statHeight, ObjectColoring.statsColor);           
 
             inventoryConsole.SetBackColor(0, 0, inventoryWidth, inventoryHeight, ObjectColoring.inventoryColor);
             inventoryConsole.Print(1, 1, "Inventory", ObjectColoring.textColor);
@@ -90,6 +90,8 @@ namespace ConsoleRogue
                     MovementDirs direction = moveDrive.mapKeyToDir(key);
                     reRender = moveDrive.movePlayer( player, direction);
                     messenger.Add(messenger.messages.getMove(direction));
+                    player.drawStats(statConsole);
+                    statConsole.SetBackColor(0, 0, statWidth, statHeight, ObjectColoring.statsColor);
                 }
                 else
                 {

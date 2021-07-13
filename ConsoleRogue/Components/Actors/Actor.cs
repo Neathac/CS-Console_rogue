@@ -12,7 +12,14 @@ namespace ConsoleRogue.Components.Actors
     class Actor : IActor, IDrawable
     {
         public string name { get; set; }
+        public int health { get; set; }
+        public int maxHealth { get; set; }
         public int perception { get; set; }
+        public int attack { get; set; }
+        public int defense { get; set; }
+        public int attackLuck { get; set; }
+        public int defenseLuck { get; set; }
+        public int gold { get; set; }
         public RLColor colour { get; set; }
         public char symbol { get; set; }
         public int xCoor { get; set; }
