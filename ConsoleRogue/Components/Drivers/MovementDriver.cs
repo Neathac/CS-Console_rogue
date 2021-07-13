@@ -39,20 +39,20 @@ namespace ConsoleRogue.Components.Drivers
         // Unsure as to how to read multiple different keys at once
         // Maybe some crazy structure reading individual buttons in driver?
         // TODO / TO call a feature
-        public bool mapKeyToDir( Player player ,RLKeyPress keyPress )
+        public MovementDirs mapKeyToDir( RLKeyPress keyPress )
         {
             switch( keyPress.Key)
             {
                 case RLKey.Up:
-                    return movePlayer( player ,MovementDirs.Top );
+                    return MovementDirs.Top;
                 case RLKey.Down:
-                    return movePlayer(player, MovementDirs.Down);
+                    return MovementDirs.Down;
                 case RLKey.Left:
-                    return movePlayer(player, MovementDirs.Left);
+                    return MovementDirs.Left;
                 case RLKey.Right:
-                    return movePlayer(player, MovementDirs.Right);
+                    return MovementDirs.Right;
                 default:
-                    return false;
+                    return MovementDirs.InPlace;
             }
         }
     }
