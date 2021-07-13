@@ -137,9 +137,9 @@ namespace ConsoleRogue.Components.Map
                 start[1] += motion[1];
                 if (digging)
                 {
-                    tileset.SetCellProperties(start[0], start[1], true, true, true);
-                    tileset.SetCellProperties(start[0]+walloffDir[0], start[1] + walloffDir[1], true, false, true);
-                    tileset.SetCellProperties(start[0] - walloffDir[0], start[1] - walloffDir[1], true, false, true);
+                    tileset.SetCellProperties(start[0], start[1], true, true, false);
+                    tileset.SetCellProperties(start[0]+walloffDir[0], start[1] + walloffDir[1], false, false, false);
+                    tileset.SetCellProperties(start[0] - walloffDir[0], start[1] - walloffDir[1], false, false, false);
                 }
             }
         }

@@ -2,6 +2,7 @@
 using ConsoleRogue.Components.Drivers;
 using ConsoleRogue.Components.Map;
 using ConsoleRogue.Customizables;
+using ConsoleRogue.Misc_Globals;
 using RLNET;
 using System;
 
@@ -40,9 +41,11 @@ namespace ConsoleRogue
         public static Player player { get; set; }
 
         public static MovementDriver moveDrive { get; set; }
+        public static Messenger messenger { get; set; }
         static void Main(string[] args)
         {
             player = new Player();
+            messenger = new Messenger();
 
             string fontFile = "terminal8x8.png";
             string screenName = "Test";
@@ -57,7 +60,7 @@ namespace ConsoleRogue
             statConsole = new RLConsole(statWidth, statHeight);
             inventoryConsole = new RLConsole(inventoryWidth, inventoryHeight);
 
-            Generator generator = new Generator( mapWidth, mapHeight, 8, 17 );
+            Generator generator = new Generator( mapWidth, mapHeight, 8, 25 );
             int numSeed = Environment.TickCount;
             Random seed = new Random(numSeed);
             tileset = generator.generateMap(seed);
@@ -65,10 +68,9 @@ namespace ConsoleRogue
             mapConsole.SetBackColor(0, 0, mapWidth, mapHeight, ObjectColoring.background);
 
             messageConsole.SetBackColor(0, 0, messageWidth, messageHeight, ObjectColoring.messageColor);
-            messageConsole.Print(1, 1, "Messages", ObjectColoring.textColor);
 
-            statConsole.SetBackColor(0, 0, statWidth, statHeight, ObjectColoring.statsColor);
-            statConsole.Print(1, 1, "Stats", ObjectColoring.textColor);
+            player.drawStats(statConsole);
+            statConsole.SetBackColor(0, 0, statWidth, statHeight, ObjectColoring.statsColor);           
 
             inventoryConsole.SetBackColor(0, 0, inventoryWidth, inventoryHeight, ObjectColoring.inventoryColor);
             inventoryConsole.Print(1, 1, "Inventory", ObjectColoring.textColor);
@@ -85,7 +87,11 @@ namespace ConsoleRogue
             {
                 if(key.Key != RLKey.Escape)
                 {
-                    reRender = moveDrive.mapKeyToDir( player, key);
+                    MovementDirs direction = moveDrive.mapKeyToDir(key);
+                    reRender = moveDrive.movePlayer( player, direction);
+                    messenger.Add(messenger.messages.getMove(direction));
+                    player.drawStats(statConsole);
+                    statConsole.SetBackColor(0, 0, statWidth, statHeight, ObjectColoring.statsColor);
                 }
                 else
                 {
@@ -99,14 +105,16 @@ namespace ConsoleRogue
         {
             if (reRender)
             {
+                
                 tileset.Draw(mapConsole);
                 player.Draw( mapConsole, tileset );
                 RLConsole.Blit(mapConsole, 0, 0, mapWidth, mapHeight, rootConsole, 0, inventoryHeight);
                 RLConsole.Blit(statConsole, 0, 0, statWidth, statHeight, rootConsole, mapWidth, 0);
                 RLConsole.Blit(messageConsole, 0, 0, messageWidth, messageHeight, rootConsole, 0, screenHeigth - messageHeight);
                 RLConsole.Blit(inventoryConsole, 0, 0, inventoryWidth, inventoryHeight, rootConsole, 0, 0);
-                
+                messenger.Draw(messageConsole);
                 rootConsole.Draw();
+                messageConsole.SetBackColor(0, 0, messageWidth, messageHeight, ObjectColoring.messageColor);
                 reRender = false;
             }            
         }
