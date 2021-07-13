@@ -54,6 +54,7 @@ namespace ConsoleRogue.Components.Map
                 Room currRoom = new Room(seed.Next(0, width-10), seed.Next(0, height-5), seed.Next(minRooms, maxRooms), seed.Next(minRooms, maxRooms));
                 if (isValid(currRoom))
                 {
+                    // TODO - Add room overlap detection
                     rooms.Add(currRoom);
                     createRoom(currRoom);
                     if (!placedPlayer)
@@ -88,16 +89,32 @@ namespace ConsoleRogue.Components.Map
             switch (relDirs)
             {
                 case MovementDirs.Down:
-                    digTunnel(new int[] { room1.centerX, room1.centerY }, new int[] { -1, room2.centerY}, new int[] { 0, 1});
+                    digTunnel(new int[] { room1.centerX, room1.centerY }, new int[] { -1, room2.centerY}, new int[] { 0, -1});
                     break;
                 case MovementDirs.Top:
-                    digTunnel(new int[] { room1.centerX, room1.centerY }, new int[] { -1, room2.centerY }, new int[] { 0, -1 });
+                    digTunnel(new int[] { room1.centerX, room1.centerY }, new int[] { -1, room2.centerY }, new int[] { 0, 1 });
                     break;
                 case MovementDirs.Left:
-                    digTunnel(new int[] { room1.centerX, room1.centerY }, new int[] { room2.centerX, -1 }, new int[] { -1, 0 });
+                    digTunnel(new int[] { room1.centerX, room1.centerY }, new int[] { room2.centerX, -1 }, new int[] { 1, 0 });
                     break;
                 case MovementDirs.Right:
-                    digTunnel(new int[] { room1.centerX, room1.centerY }, new int[] { room2.centerX, -1 }, new int[] { 1, 0 });
+                    digTunnel(new int[] { room1.centerX, room1.centerY }, new int[] { room2.centerX, -1 }, new int[] { -1, 0 });
+                    break;
+                case MovementDirs.DownLeft:
+                    digTunnel(new int[] { room1.centerX, room1.centerY }, new int[] { -1, room2.centerY }, new int[] { 0, -1 });
+                    digTunnel(new int[] { room1.centerX, room2.centerY }, new int[] { room2.centerX, -1 }, new int[] { 1, 0 });
+                    break;
+                case MovementDirs.DownRight:
+                    digTunnel(new int[] { room1.centerX, room1.centerY }, new int[] { -1, room2.centerY }, new int[] { 0, -1 });
+                    digTunnel(new int[] { room1.centerX, room2.centerY }, new int[] { room2.centerX, -1 }, new int[] { -1, 0 });
+                    break;
+                case MovementDirs.TopLeft:
+                    digTunnel(new int[] { room1.centerX, room1.centerY }, new int[] { -1, room2.centerY }, new int[] { 0, 1 });
+                    digTunnel(new int[] { room1.centerX, room2.centerY }, new int[] { room2.centerX, -1 }, new int[] { 1, 0 });
+                    break;
+                case MovementDirs.TopRight:
+                    digTunnel(new int[] { room1.centerX, room1.centerY }, new int[] { -1, room2.centerY }, new int[] { 0, 1 });
+                    digTunnel(new int[] { room1.centerX, room2.centerY }, new int[] { room2.centerX, -1 }, new int[] { -1, 0 });
                     break;
             }
         }
@@ -171,7 +188,7 @@ namespace ConsoleRogue.Components.Map
                 }
                 else // x is above y
                 {
-                    return MovementDirs.TopRight;
+                    return MovementDirs.TopLeft;
                 }
             }
         }
