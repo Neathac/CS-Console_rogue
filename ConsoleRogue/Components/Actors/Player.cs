@@ -13,8 +13,13 @@ namespace ConsoleRogue.Components.Actors
             perception = 15;
             colour = ObjectColoring.player;
             symbol = '@';
-            xCoor = 10; // Replace with dynamically generated values
-            yCoor = 10; // TODO
+            xCoor = 10; // Default position
+            yCoor = 10;
+        }
+        public void setStart(int x, int y)
+        {
+            xCoor = x; 
+            yCoor = y;
         }
     }
 }
