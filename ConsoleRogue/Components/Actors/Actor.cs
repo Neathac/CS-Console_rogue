@@ -20,6 +20,7 @@ namespace ConsoleRogue.Components.Actors
         public int attackLuck { get; set; }
         public int defenseLuck { get; set; }
         public int gold { get; set; }
+        public int agility { get; set; }
         public RLColor colour { get; set; }
         public char symbol { get; set; }
         public int xCoor { get; set; }
@@ -33,7 +34,7 @@ namespace ConsoleRogue.Components.Actors
 
             if(map.IsInFov(xCoor, yCoor))
             {
-                console.Set(xCoor, yCoor, colour, ObjectColoring.floorVisible, symbol);
+                console.Set(xCoor, yCoor, colour, ObjectColoring.background, symbol);
             }
             else
             {

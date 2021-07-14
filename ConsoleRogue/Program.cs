@@ -5,6 +5,7 @@ using ConsoleRogue.Customizables;
 using ConsoleRogue.Misc_Globals;
 using RLNET;
 using System;
+using System.Collections.Generic;
 
 namespace ConsoleRogue
 {
@@ -39,13 +40,15 @@ namespace ConsoleRogue
         public static Tileset tileset { get; set; }
 
         public static Player player { get; set; }
-
+        public static List<Goblin> goblins { get; set; }
+        public static Goblin testGoblin { get; set; }
         public static MovementDriver moveDrive { get; set; }
         public static Messenger messenger { get; set; }
         static void Main(string[] args)
         {
             player = new Player();
             messenger = new Messenger();
+            goblins = new List<Goblin>();
 
             string fontFile = "terminal8x8.png";
             string screenName = "Test";
@@ -60,11 +63,12 @@ namespace ConsoleRogue
             statConsole = new RLConsole(statWidth, statHeight);
             inventoryConsole = new RLConsole(inventoryWidth, inventoryHeight);
 
-            Generator generator = new Generator( mapWidth, mapHeight, 8, 25 );
+            Generator generator = new Generator( mapWidth, mapHeight, 5, 25);
             int numSeed = Environment.TickCount;
             Random seed = new Random(numSeed);
-            tileset = generator.generateMap(seed);
-
+            tileset = generator.generateMap(seed, 1);
+            setGoblins(generator.getGoblins());
+            testGoblin = new Goblin(1, 10, 10);
             mapConsole.SetBackColor(0, 0, mapWidth, mapHeight, ObjectColoring.background);
 
             messageConsole.SetBackColor(0, 0, messageWidth, messageHeight, ObjectColoring.messageColor);
@@ -78,6 +82,15 @@ namespace ConsoleRogue
             moveDrive = new MovementDriver();
 
             rootConsole.Run();
+        }
+
+        public static void setGoblins(List<Goblin> newGoblins)
+        {
+            goblins.Clear();
+            foreach(Goblin goblin in newGoblins)
+            {
+                goblins.Add(goblin);
+            }
         }
 
         private static void onRootConsoleUpdate( object sender, UpdateEventArgs e)
@@ -105,9 +118,20 @@ namespace ConsoleRogue
         {
             if (reRender)
             {
+               
                 
                 tileset.Draw(mapConsole);
                 player.Draw( mapConsole, tileset );
+                int iterator = 0;
+                foreach(Goblin goblin in goblins)
+                {
+                    goblin.Draw(mapConsole, tileset);
+                    if (tileset.IsInFov(goblin.xCoor, goblin.yCoor))
+                    {
+                        goblin.drawStats(statConsole, iterator);
+                        ++iterator;
+                    }
+                }
                 RLConsole.Blit(mapConsole, 0, 0, mapWidth, mapHeight, rootConsole, 0, inventoryHeight);
                 RLConsole.Blit(statConsole, 0, 0, statWidth, statHeight, rootConsole, mapWidth, 0);
                 RLConsole.Blit(messageConsole, 0, 0, messageWidth, messageHeight, rootConsole, 0, screenHeigth - messageHeight);

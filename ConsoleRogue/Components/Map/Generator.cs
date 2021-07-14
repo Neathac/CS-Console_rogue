@@ -1,4 +1,5 @@
-﻿using ConsoleRogue.Misc_Globals;
+﻿using ConsoleRogue.Components.Actors;
+using ConsoleRogue.Misc_Globals;
 using RogueSharp;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ namespace ConsoleRogue.Components.Map
         private readonly int minRooms;
         private readonly int maxRooms;
         private readonly Tileset tileset;
+        private List<Goblin> goblinList;
 
         private List<Room> rooms;
 
@@ -24,12 +26,14 @@ namespace ConsoleRogue.Components.Map
             this.maxRooms = maxRooms;
             tileset = new Tileset();
             rooms = new List<Room>();
+            goblinList = new List<Goblin>();
         }
 
-        public Tileset generateMap( Random seed )
+        public Tileset generateMap( Random seed, int level )
         {
             bool placedPlayer = false;
             rooms.Clear();
+            goblinList.Clear();
             // RogueSharp Initialize
             tileset.Initialize( width, height );
 
@@ -62,6 +66,10 @@ namespace ConsoleRogue.Components.Map
                         Program.player.setStart(currRoom.centerX, currRoom.centerY);
                         placedPlayer = true;
                     }
+                    else
+                    {
+                        goblinList = createEnemies(currRoom.centerX, currRoom.centerY, level, goblinList);
+                    }
                 }
                 else
                 {
@@ -71,6 +79,11 @@ namespace ConsoleRogue.Components.Map
             connectAllRooms(rooms);
 
             return tileset;
+        }
+
+        public List<Goblin> getGoblins()
+        {
+            return goblinList;
         }
 
         private void connectAllRooms(List<Room> rooms)
@@ -208,6 +221,22 @@ namespace ConsoleRogue.Components.Map
                     tileset.SetCellProperties(room.rightEdge, room.topEdge + i, false, false, false);
                 }
             }
+        }
+
+        private List<Goblin> createEnemies(int centerX, int centerY, int level, List<Goblin> goblins)
+        {
+            for(int i = -1; i <= 1; i +=2)
+            {
+                for (int j = -1; j <= 1; j += 2)
+                {
+                    if (tileset.GetCell(centerX + i, centerY + j).IsWalkable)
+                    {
+                        Goblin goblin = new Goblin(level, centerX + i, centerY + j);
+                        goblins.Add(goblin);
+                    }
+                }
+            }
+            return goblins;
         }
 
         private bool isValid( Room room )
