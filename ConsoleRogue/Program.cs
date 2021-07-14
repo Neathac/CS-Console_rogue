@@ -88,7 +88,12 @@ namespace ConsoleRogue
             {
                 if(key.Key == RLKey.Space)
                 {
-
+                    Actor entity = tileset.getNearbyEntity(player);
+                    if (!entity.Equals(player))
+                    {
+                        reRender = true;
+                        Statistics.playerAction(player, entity, tileset);
+                    }
                 }
                 else if(key.Key != RLKey.Escape)
                 {

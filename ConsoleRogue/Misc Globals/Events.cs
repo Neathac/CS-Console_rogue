@@ -10,6 +10,7 @@ namespace ConsoleRogue.Misc_Globals
         RecievedDamage,
         Moved,
         Found,
-        Destroyed
+        Destroyed,
+        Nothing
     }
 }

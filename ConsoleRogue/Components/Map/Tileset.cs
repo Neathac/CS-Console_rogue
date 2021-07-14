@@ -14,10 +14,12 @@ namespace ConsoleRogue.Components.Map
         public static char unpassable = '#';
         public static char passable = '.';
         public List<Goblin> goblins;
+        public List<Actors.Pack> packs;
 
         public Tileset()
         {
             this.goblins = new List<Goblin>();
+            this.packs = new List<Actors.Pack>();
         }
         public void Draw( RLConsole mapConsole )
         {
@@ -26,6 +28,12 @@ namespace ConsoleRogue.Components.Map
             {
                 SetConsoleSymbolForCell( mapConsole, cell );
             }
+        }
+
+        public void removeGoblin(Goblin goblin)
+        {
+            goblins.Remove(goblin);
+            SetCellProperties(goblin.xCoor, goblin.yCoor, true, true, true);
         }
 
         public void setGoblins(List<Goblin> newGoblins)
@@ -111,10 +119,20 @@ namespace ConsoleRogue.Components.Map
             return false;
         }
 
-      //  public Actor getNearbyEntity(Actor actor)
-      //  {
-
-      //  }
+        public Actor getNearbyEntity(Actor actor)
+        {
+            foreach(Goblin goblin in goblins)
+            {
+                if (IsInFov(goblin.xCoor, goblin.yCoor))
+                {
+                    if (Math.Abs(goblin.yCoor - actor.yCoor) <= 2 && Math.Abs(goblin.xCoor - actor.xCoor) <= 2)
+                    {
+                        return goblin;
+                    }
+                }
+            }
+            return actor;
+        }
 
         public MovementDirs getRelativeDirs(int[] x, int[] y)
         {
