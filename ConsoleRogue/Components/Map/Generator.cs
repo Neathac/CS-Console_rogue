@@ -92,7 +92,7 @@ namespace ConsoleRogue.Components.Map
             {
                 for (int j = i+1; j < rooms.Count; ++j)
                 {
-                    connectTwoRooms(rooms[i], rooms[j], getRelativeDirs(new int[] { rooms[i].centerX, rooms[i].centerY }, new int[] { rooms[j].centerX, rooms[j].centerY }));
+                    connectTwoRooms(rooms[i], rooms[j], tileset.getRelativeDirs(new int[] { rooms[i].centerX, rooms[i].centerY }, new int[] { rooms[j].centerX, rooms[j].centerY }));
                 }
             }
         }
@@ -153,55 +153,6 @@ namespace ConsoleRogue.Components.Map
                     tileset.SetCellProperties(start[0], start[1], true, true, false);
                     tileset.SetCellProperties(start[0]+walloffDir[0], start[1] + walloffDir[1], false, false, false);
                     tileset.SetCellProperties(start[0] - walloffDir[0], start[1] - walloffDir[1], false, false, false);
-                }
-            }
-        }
-
-        private MovementDirs getRelativeDirs(int[] x, int[] y)
-        {
-            if (x[0] > y[0]) // x is to the right of y
-            {
-                if (x[1] > y[1]) // x is below y
-                {
-                    return MovementDirs.DownRight;
-                }
-                else if (x[1] == y[1]) // x is on the same vertical line as y
-                {
-                    return MovementDirs.Right;
-                }
-                else // x is above y
-                {
-                    return MovementDirs.TopRight;
-                }
-            }
-            else if (x[0] == y[0]) // x and y are on the same horizontal level
-            {
-                if (x[1] > y[1]) // x is below y
-                {
-                    return MovementDirs.Down;
-                }
-                else if (x[1] == y[1]) // x is on the same vertical line as y
-                {
-                    return MovementDirs.InPlace;
-                }
-                else // x is above y
-                {
-                    return MovementDirs.Top;
-                }
-            }
-            else // x is to the left of y
-            {
-                if (x[1] > y[1]) // x is below y
-                {
-                    return MovementDirs.DownLeft;
-                }
-                else if (x[1] == y[1]) // x is on the same vertical line as y
-                {
-                    return MovementDirs.Left;
-                }
-                else // x is above y
-                {
-                    return MovementDirs.TopLeft;
                 }
             }
         }

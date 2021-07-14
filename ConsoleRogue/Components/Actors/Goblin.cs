@@ -14,13 +14,14 @@ namespace ConsoleRogue.Components.Actors
             name = "Goblin";
             colour = ObjectColoring.enemy;
             symbol = 'G';
-            attack = random.Next(2+level, 7+level);
+            attack = random.Next(2+level, 6+level);
             defense = random.Next(0 + level, 2 + level);
             attackLuck = 5;
             defenseLuck = 5;
             maxHealth = random.Next(2 + level, 7 + level);
             health = maxHealth;
-            agility = 100 - level * 5; 
+            agility = 100 - level * 5;
+            moves = 0;
             xCoor = x; // Default position
             yCoor = y;
         }

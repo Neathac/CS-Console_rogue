@@ -15,7 +15,7 @@ namespace ConsoleRogue.Components.Actors
             name = "Credit warrior";
             colour = ObjectColoring.player;
             symbol = '@';
-            attack = 5;
+            attack = 6;
             defense = 2;
             attackLuck = 5;
             defenseLuck = 5;

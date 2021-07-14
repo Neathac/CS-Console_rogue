@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using ConsoleRogue.Components.Actors;
 using ConsoleRogue.Customizables;
+using ConsoleRogue.Misc_Globals;
 using RLNET;
 using RogueSharp;
 
@@ -12,13 +13,27 @@ namespace ConsoleRogue.Components.Map
     {
         public static char unpassable = '#';
         public static char passable = '.';
+        public List<Goblin> goblins;
 
+        public Tileset()
+        {
+            this.goblins = new List<Goblin>();
+        }
         public void Draw( RLConsole mapConsole )
         {
             mapConsole.Clear();
             foreach ( Cell cell in GetAllCells() )
             {
                 SetConsoleSymbolForCell( mapConsole, cell );
+            }
+        }
+
+        public void setGoblins(List<Goblin> newGoblins)
+        {
+            goblins.Clear();
+            foreach (Goblin goblin in newGoblins)
+            {
+                goblins.Add(goblin);
             }
         }
 
@@ -94,6 +109,60 @@ namespace ConsoleRogue.Components.Map
             }
 
             return false;
-        }       
+        }
+
+      //  public Actor getNearbyEntity(Actor actor)
+      //  {
+
+      //  }
+
+        public MovementDirs getRelativeDirs(int[] x, int[] y)
+        {
+            if (x[0] > y[0]) // x is to the right of y
+            {
+                if (x[1] > y[1]) // x is below y
+                {
+                    return MovementDirs.DownRight;
+                }
+                else if (x[1] == y[1]) // x is on the same vertical line as y
+                {
+                    return MovementDirs.Right;
+                }
+                else // x is above y
+                {
+                    return MovementDirs.TopRight;
+                }
+            }
+            else if (x[0] == y[0]) // x and y are on the same horizontal level
+            {
+                if (x[1] > y[1]) // x is below y
+                {
+                    return MovementDirs.Down;
+                }
+                else if (x[1] == y[1]) // x is on the same vertical line as y
+                {
+                    return MovementDirs.InPlace;
+                }
+                else // x is above y
+                {
+                    return MovementDirs.Top;
+                }
+            }
+            else // x is to the left of y
+            {
+                if (x[1] > y[1]) // x is below y
+                {
+                    return MovementDirs.DownLeft;
+                }
+                else if (x[1] == y[1]) // x is on the same vertical line as y
+                {
+                    return MovementDirs.Left;
+                }
+                else // x is above y
+                {
+                    return MovementDirs.TopLeft;
+                }
+            }
+        }
     }
 }

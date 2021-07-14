@@ -40,15 +40,12 @@ namespace ConsoleRogue
         public static Tileset tileset { get; set; }
 
         public static Player player { get; set; }
-        public static List<Goblin> goblins { get; set; }
-        public static Goblin testGoblin { get; set; }
         public static MovementDriver moveDrive { get; set; }
         public static Messenger messenger { get; set; }
         static void Main(string[] args)
         {
             player = new Player();
             messenger = new Messenger();
-            goblins = new List<Goblin>();
 
             string fontFile = "terminal8x8.png";
             string screenName = "Test";
@@ -67,8 +64,8 @@ namespace ConsoleRogue
             int numSeed = Environment.TickCount;
             Random seed = new Random(numSeed);
             tileset = generator.generateMap(seed, 1);
-            setGoblins(generator.getGoblins());
-            testGoblin = new Goblin(1, 10, 10);
+            tileset.setGoblins(generator.getGoblins());
+
             mapConsole.SetBackColor(0, 0, mapWidth, mapHeight, ObjectColoring.background);
 
             messageConsole.SetBackColor(0, 0, messageWidth, messageHeight, ObjectColoring.messageColor);
@@ -84,21 +81,16 @@ namespace ConsoleRogue
             rootConsole.Run();
         }
 
-        public static void setGoblins(List<Goblin> newGoblins)
-        {
-            goblins.Clear();
-            foreach(Goblin goblin in newGoblins)
-            {
-                goblins.Add(goblin);
-            }
-        }
-
         private static void onRootConsoleUpdate( object sender, UpdateEventArgs e)
         {
             RLKeyPress key = rootConsole.Keyboard.GetKeyPress();
             if( key != null)
             {
-                if(key.Key != RLKey.Escape)
+                if(key.Key == RLKey.Space)
+                {
+
+                }
+                else if(key.Key != RLKey.Escape)
                 {
                     MovementDirs direction = moveDrive.mapKeyToDir(key);
                     reRender = moveDrive.movePlayer( player, direction);
@@ -123,12 +115,22 @@ namespace ConsoleRogue
                 tileset.Draw(mapConsole);
                 player.Draw( mapConsole, tileset );
                 int iterator = 0;
-                foreach(Goblin goblin in goblins)
+                foreach (Goblin goblin in tileset.goblins)
                 {
                     goblin.Draw(mapConsole, tileset);
                     if (tileset.IsInFov(goblin.xCoor, goblin.yCoor))
                     {
                         goblin.drawStats(statConsole, iterator);
+                        if(moveDrive.goblinAction(goblin, player, tileset))
+                        {
+                            int attackRes = Statistics.attack(goblin, player);
+                            if(attackRes == (-1))
+                            {
+                                rootConsole.Close();
+                                Console.WriteLine("You have died");
+                            }
+                            messenger.Add(messenger.messages.getDamageMessage(Events.RecievedDamage,attackRes));
+                        }
                         ++iterator;
                     }
                 }

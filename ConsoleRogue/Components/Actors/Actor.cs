@@ -25,6 +25,7 @@ namespace ConsoleRogue.Components.Actors
         public char symbol { get; set; }
         public int xCoor { get; set; }
         public int yCoor { get; set; }
+        public int moves { get; set; }
         public void Draw( RLConsole console, RogueSharp.IMap map)
         {
             if( !map.GetCell( xCoor, yCoor ).IsExplored )
@@ -40,6 +41,17 @@ namespace ConsoleRogue.Components.Actors
             {
                 console.Set(xCoor, yCoor, ObjectColoring.floorInvisible, ObjectColoring.background, Tileset.passable);
             }
+        }
+
+        public bool toMove(int time)
+        {
+            moves += time;
+            if(moves >= agility)
+            {
+                moves -= agility;
+                return true;
+            }
+            return false;
         }
     }
 }

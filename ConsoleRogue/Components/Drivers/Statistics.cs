@@ -8,9 +8,24 @@ namespace ConsoleRogue.Components.Drivers
 {
     class Statistics
     {
-        public void attack(Actor attacker, Actor defender)
+        public static int attack(Actor attacker, Actor defender)
         {
-
+            Random random = new Random();
+            int dealtDmg = attacker.attack - defender.defense;
+            if (random.Next(attacker.attackLuck, 100) > 95)
+            {
+                dealtDmg *= 2;
+            }
+            if (random.Next(defender.defenseLuck, 100) > 95)
+            {
+                dealtDmg /= 2;
+            }
+            defender.health = defender.health - dealtDmg;
+            if(defender.health <= 0)
+            {
+                return -1;
+            }
+            return dealtDmg;
         }
     }
 }
