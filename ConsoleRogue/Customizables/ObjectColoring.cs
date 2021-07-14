@@ -18,7 +18,7 @@ namespace ConsoleRogue.Customizables
         public static RLColor statsColor = Pallete.TerciaryDarkLight;
         public static RLColor healthBarLight = Pallete.Primary;
         public static RLColor healthBarDark = Pallete.PrimaryDark;
-
+        public static RLColor pickupColor = Pallete.TerciaryLight;
         // Map elements
         public static RLColor wallVisible = Pallete.PrimaryLight;
         public static RLColor floorVisible = Pallete.SecondaryLight;

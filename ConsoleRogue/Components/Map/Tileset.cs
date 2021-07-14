@@ -15,6 +15,7 @@ namespace ConsoleRogue.Components.Map
         public static char passable = '.';
         public List<Goblin> goblins;
         public List<Actors.Pack> packs;
+        public Actors.Pack exit;
 
         public Tileset()
         {
@@ -43,6 +44,20 @@ namespace ConsoleRogue.Components.Map
             {
                 goblins.Add(goblin);
             }
+        }
+
+        public void setPacks(List<Actors.Pack> newPacks)
+        {
+            packs.Clear();
+            foreach(Actors.Pack pack in newPacks)
+            {
+                packs.Add(pack);
+            }
+        }
+        public void removePack(Actors.Pack pack)
+        {
+            packs.Remove(pack);
+            SetCellProperties(pack.xCoor, pack.yCoor, true, true, true);
         }
 
         private void SetConsoleSymbolForCell( RLConsole console, Cell cell)
@@ -128,6 +143,16 @@ namespace ConsoleRogue.Components.Map
                     if (Math.Abs(goblin.yCoor - actor.yCoor) <= 2 && Math.Abs(goblin.xCoor - actor.xCoor) <= 2)
                     {
                         return goblin;
+                    }
+                }
+            }
+            foreach(Actors.Pack pack in packs)
+            {
+                if (IsInFov(pack.xCoor, pack.yCoor))
+                {
+                    if (Math.Abs(pack.yCoor - actor.yCoor) <= 2 && Math.Abs(pack.xCoor - actor.xCoor) <= 2)
+                    {
+                        return pack;
                     }
                 }
             }

@@ -1,5 +1,6 @@
 ﻿using ConsoleRogue.Components.Actors;
 using ConsoleRogue.Components.Map;
+using ConsoleRogue.Customizables;
 using ConsoleRogue.Misc_Globals;
 using RLNET;
 using System;
@@ -22,6 +23,10 @@ namespace ConsoleRogue.Components.Drivers
             {
                 dealtDmg /= 2;
             }
+            if(dealtDmg < 0)
+            {
+                dealtDmg = 0;
+            }
             defender.health = defender.health - dealtDmg;
             if(defender.health <= 0)
             {
@@ -29,15 +34,18 @@ namespace ConsoleRogue.Components.Drivers
             }
             return dealtDmg;
         }
-        public static Events playerAction(Actor player,Actor target, Tileset tileset)
+        public static Events playerAction(Actor player,Actor target, Tileset tileset, Messenger messenger)
         {
             if(target is Enemy)
             {
-                if(attack(player, target) < 0)
+                int attackRes = attack(player, target);
+                if(attackRes < 0)
                 {
                     tileset.removeGoblin(target as Goblin);
+                    messenger.Add(Messages.getDestroyed(target));
                     return Events.Destroyed;
                 }
+                messenger.Add(Messages.getDamageMessage(Events.DealtDamage, attackRes));
                 return Events.DealtDamage;
             }
             else if (target is Actors.Pack)
@@ -47,25 +55,25 @@ namespace ConsoleRogue.Components.Drivers
                 {
                     case Misc_Globals.Pack.AGILITY:
                         player.agility -= 2;
-                        tileset.packs.Remove(target as Actors.Pack);
+                        tileset.removePack(target as Actors.Pack);
                         break;
                     case Misc_Globals.Pack.ATTACK:
                         player.attack += 2;
-                        tileset.packs.Remove(target as Actors.Pack);
+                        tileset.removePack(target as Actors.Pack);
                         break;
                     case Misc_Globals.Pack.DEFENSE:
                         player.defense += 2;
-                        tileset.packs.Remove(target as Actors.Pack);
+                        tileset.removePack(target as Actors.Pack);
                         break;
                     case Misc_Globals.Pack.HEALTH:
                         player.maxHealth += 2;
                         player.health = player.maxHealth;
-                        tileset.packs.Remove(target as Actors.Pack);
+                        tileset.removePack(target as Actors.Pack);
                         break;
-                    case Misc_Globals.Pack.EXIT:
-                        
+                    default:                        
                         break;
                 }
+                messenger.Add(Messages.getFound(casted.packKind));
             }
             return Events.Nothing;
         }

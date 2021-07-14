@@ -11,8 +11,15 @@ namespace ConsoleRogue.Components.Actors
         public Pack(int x, int y, Misc_Globals.Pack kind)
         {
             perception = 10;
-            colour = ObjectColoring.inventoryColor;
-            symbol = 'P';
+            colour = ObjectColoring.pickupColor;
+            if(kind != Misc_Globals.Pack.EXIT)
+            {
+                symbol = 'P';
+            }
+            else
+            {
+                symbol = 'E';
+            }
             attack = 0;
             defense = 0;
             attackLuck = 0;

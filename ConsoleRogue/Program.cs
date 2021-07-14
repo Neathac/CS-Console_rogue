@@ -65,6 +65,7 @@ namespace ConsoleRogue
             Random seed = new Random(numSeed);
             tileset = generator.generateMap(seed, 1);
             tileset.setGoblins(generator.getGoblins());
+            tileset.setPacks(generator.getPacks());
 
             mapConsole.SetBackColor(0, 0, mapWidth, mapHeight, ObjectColoring.background);
 
@@ -77,7 +78,9 @@ namespace ConsoleRogue
             inventoryConsole.Print(1, 1, "Inventory", ObjectColoring.textColor);
 
             moveDrive = new MovementDriver();
-
+            tileset.Draw(mapConsole);
+            player.Draw(mapConsole, tileset);
+            tileset.exit.Draw(mapConsole, tileset);
             rootConsole.Run();
         }
 
@@ -92,33 +95,39 @@ namespace ConsoleRogue
                     if (!entity.Equals(player))
                     {
                         reRender = true;
-                        Statistics.playerAction(player, entity, tileset);
+                        Statistics.playerAction(player, entity, tileset, messenger);
+                        messenger.Draw(messageConsole);
+                        messageConsole.SetBackColor(0, 0, messageWidth, messageHeight, ObjectColoring.messageColor);
+                        player.drawStats(statConsole);
+                        statConsole.SetBackColor(0, 0, statWidth, statHeight, ObjectColoring.statsColor);
                     }
                 }
                 else if(key.Key != RLKey.Escape)
                 {
                     MovementDirs direction = moveDrive.mapKeyToDir(key);
                     reRender = moveDrive.movePlayer( player, direction);
-                    messenger.Add(messenger.messages.getMove(direction));
+                    messenger.Add(Messages.getMove(direction));
                     player.drawStats(statConsole);
                     statConsole.SetBackColor(0, 0, statWidth, statHeight, ObjectColoring.statsColor);
+                    messenger.Draw(messageConsole);
+                    messageConsole.SetBackColor(0, 0, messageWidth, messageHeight, ObjectColoring.messageColor);
                 }
                 else
                 {
                     rootConsole.Close();
                 }
             }
+            
             tileset.updatePlayerVisibility( player );
         }
 
         private static void onRootConsoleRender( object sender, UpdateEventArgs e)
         {
             if (reRender)
-            {
-               
-                
+            {                            
                 tileset.Draw(mapConsole);
                 player.Draw( mapConsole, tileset );
+                tileset.exit.Draw(mapConsole, tileset);
                 int iterator = 0;
                 foreach (Goblin goblin in tileset.goblins)
                 {
@@ -134,20 +143,25 @@ namespace ConsoleRogue
                                 rootConsole.Close();
                                 Console.WriteLine("You have died");
                             }
-                            messenger.Add(messenger.messages.getDamageMessage(Events.RecievedDamage,attackRes));
+                            messenger.Add(Messages.getDamageMessage(Events.RecievedDamage,attackRes));
+                            messageConsole.SetBackColor(0, 0, messageWidth, messageHeight, ObjectColoring.messageColor);
                         }
                         ++iterator;
                     }
+                }
+                foreach(Components.Actors.Pack pack in tileset.packs)
+                {
+                    pack.Draw(mapConsole, tileset);
                 }
                 RLConsole.Blit(mapConsole, 0, 0, mapWidth, mapHeight, rootConsole, 0, inventoryHeight);
                 RLConsole.Blit(statConsole, 0, 0, statWidth, statHeight, rootConsole, mapWidth, 0);
                 RLConsole.Blit(messageConsole, 0, 0, messageWidth, messageHeight, rootConsole, 0, screenHeigth - messageHeight);
                 RLConsole.Blit(inventoryConsole, 0, 0, inventoryWidth, inventoryHeight, rootConsole, 0, 0);
-                messenger.Draw(messageConsole);
-                rootConsole.Draw();
+                statConsole.SetBackColor(0, 0, statWidth, statHeight, ObjectColoring.statsColor);
                 messageConsole.SetBackColor(0, 0, messageWidth, messageHeight, ObjectColoring.messageColor);
+                rootConsole.Draw();
                 reRender = false;
-            }            
+            }
         }
     }
 }
