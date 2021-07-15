@@ -1,4 +1,13 @@
 # The Console RogueLike
+## About
+
+The game is meant to provide a dungeon-crawler rogue-like experience. The player spawns on a randomly generated map with a random amount of upgrade packs scattered around the map along with a proportional amount of enemies. A single exit is placed on each map that spawns the player on a newly generated map with stronger enemies.
+
+## Control scheme
+
+ - Arrows - Simple movement by 1 tile in appropriate direction
+ - Space - Player action on an object within a range of 2 tiles in any direction. This action can be an attack, picking up upgrades or using the exit into a new level.
+
 ## Dependencies
 The following packages were installed:
  - RLNET - version 1.0.6
