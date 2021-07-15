@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using ConsoleRogue.Components.Actors;
 using ConsoleRogue.Customizables;
+using ConsoleRogue.Misc_Globals;
 using RLNET;
 using RogueSharp;
 
@@ -12,7 +13,15 @@ namespace ConsoleRogue.Components.Map
     {
         public static char unpassable = '#';
         public static char passable = '.';
+        public List<Goblin> goblins;
+        public List<Actors.Pack> packs;
+        public Actors.Pack exit;
 
+        public Tileset()
+        {
+            this.goblins = new List<Goblin>();
+            this.packs = new List<Actors.Pack>();
+        }
         public void Draw( RLConsole mapConsole )
         {
             mapConsole.Clear();
@@ -20,6 +29,35 @@ namespace ConsoleRogue.Components.Map
             {
                 SetConsoleSymbolForCell( mapConsole, cell );
             }
+        }
+
+        public void removeGoblin(Goblin goblin)
+        {
+            goblins.Remove(goblin);
+            SetCellProperties(goblin.xCoor, goblin.yCoor, true, true, true);
+        }
+
+        public void setGoblins(List<Goblin> newGoblins)
+        {
+            goblins.Clear();
+            foreach (Goblin goblin in newGoblins)
+            {
+                goblins.Add(goblin);
+            }
+        }
+
+        public void setPacks(List<Actors.Pack> newPacks)
+        {
+            packs.Clear();
+            foreach(Actors.Pack pack in newPacks)
+            {
+                packs.Add(pack);
+            }
+        }
+        public void removePack(Actors.Pack pack)
+        {
+            packs.Remove(pack);
+            SetCellProperties(pack.xCoor, pack.yCoor, true, true, true);
         }
 
         private void SetConsoleSymbolForCell( RLConsole console, Cell cell)
@@ -94,6 +132,87 @@ namespace ConsoleRogue.Components.Map
             }
 
             return false;
-        }       
+        }
+
+        public Actor getNearbyEntity(Actor actor)
+        {
+            foreach(Goblin goblin in goblins)
+            {
+                if (IsInFov(goblin.xCoor, goblin.yCoor))
+                {
+                    if (Math.Abs(goblin.yCoor - actor.yCoor) <= 2 && Math.Abs(goblin.xCoor - actor.xCoor) <= 2)
+                    {
+                        return goblin;
+                    }
+                }
+            }
+            foreach(Actors.Pack pack in packs)
+            {
+                if (IsInFov(pack.xCoor, pack.yCoor))
+                {
+                    if (Math.Abs(pack.yCoor - actor.yCoor) <= 2 && Math.Abs(pack.xCoor - actor.xCoor) <= 2)
+                    {
+                        return pack;
+                    }
+                }
+            }
+            if(IsInFov(exit.xCoor, exit.yCoor))
+            {
+                if (Math.Abs(exit.yCoor - actor.yCoor) <= 2 && Math.Abs(exit.xCoor - actor.xCoor) <= 2)
+                {
+                    return exit;
+                }
+            }
+            return actor;
+        }
+
+        public MovementDirs getRelativeDirs(int[] x, int[] y)
+        {
+            if (x[0] > y[0]) // x is to the right of y
+            {
+                if (x[1] > y[1]) // x is below y
+                {
+                    return MovementDirs.DownRight;
+                }
+                else if (x[1] == y[1]) // x is on the same vertical line as y
+                {
+                    return MovementDirs.Right;
+                }
+                else // x is above y
+                {
+                    return MovementDirs.TopRight;
+                }
+            }
+            else if (x[0] == y[0]) // x and y are on the same horizontal level
+            {
+                if (x[1] > y[1]) // x is below y
+                {
+                    return MovementDirs.Down;
+                }
+                else if (x[1] == y[1]) // x is on the same vertical line as y
+                {
+                    return MovementDirs.InPlace;
+                }
+                else // x is above y
+                {
+                    return MovementDirs.Top;
+                }
+            }
+            else // x is to the left of y
+            {
+                if (x[1] > y[1]) // x is below y
+                {
+                    return MovementDirs.DownLeft;
+                }
+                else if (x[1] == y[1]) // x is on the same vertical line as y
+                {
+                    return MovementDirs.Left;
+                }
+                else // x is above y
+                {
+                    return MovementDirs.TopLeft;
+                }
+            }
+        }
     }
 }

@@ -15,12 +15,13 @@ namespace ConsoleRogue.Components.Actors
             name = "Credit warrior";
             colour = ObjectColoring.player;
             symbol = '@';
-            attack = 5;
+            attack = 6;
             defense = 2;
             attackLuck = 5;
             defenseLuck = 5;
             maxHealth = 10;
             health = 10;
+            agility = 80;
             gold = 0;
             xCoor = 10; // Default position
             yCoor = 10;
@@ -32,6 +33,7 @@ namespace ConsoleRogue.Components.Actors
             console.Print(1, 3, "Attack: " + attack.ToString(), ObjectColoring.textColor);
             console.Print(1, 5, "Defense: " + defense.ToString(), ObjectColoring.textColor);
             console.Print(1, 7, "Health: " + health.ToString() + "/" + maxHealth.ToString(), ObjectColoring.textColor);
+            console.Print(1, 9, "Agility: " + (100-agility).ToString(), ObjectColoring.textColor);
         }
         public void setStart(int x, int y)
         {

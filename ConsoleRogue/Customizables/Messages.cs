@@ -1,4 +1,5 @@
-﻿using ConsoleRogue.Misc_Globals;
+﻿using ConsoleRogue.Components.Actors;
+using ConsoleRogue.Misc_Globals;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,12 +8,12 @@ namespace ConsoleRogue.Customizables
 {
     class Messages
     {
-        private string dealtDamage = "You dealt damage for ";
-        private string takenDamage = "You have taken damage for ";
-        private string moved = "You moved ";
-        private string found = "You found ";
-        private string destroyed = "You destroyed a ";
-        public string getDamageMessage(Events newEvent, int damage)
+        private static string dealtDamage = "You dealt damage for ";
+        private static string takenDamage = "You have taken damage for ";
+        private static string moved = "You moved ";
+        private static string found = "You found ";
+        private static string destroyed = "You destroyed a ";
+        public static string getDamageMessage(Events newEvent, int damage)
         {
             switch (newEvent)
             {
@@ -25,7 +26,35 @@ namespace ConsoleRogue.Customizables
             }
         }
 
-        public string getMove(MovementDirs direction)
+        public static string getDestroyed(Actor killed)
+        {
+            return (destroyed + killed.name);
+        }
+
+        public static string getExit()
+        {
+            return (found + "an exit");
+        }
+
+        public static string getFound(Misc_Globals.Pack pack)
+        {
+            switch (pack)
+            {
+                case Misc_Globals.Pack.AGILITY:
+                    return (found + "an agility boost");
+                case Misc_Globals.Pack.ATTACK:
+                    return (found + "an attack boost");
+                case Misc_Globals.Pack.DEFENSE:
+                    return (found + "an defence boost");
+                case Misc_Globals.Pack.HEALTH:
+                    return (found + "an health boost");
+                case Misc_Globals.Pack.EXIT:
+                    return (found + " an exit");
+                default:
+                    return "";
+            }
+        }
+        public static string getMove(MovementDirs direction)
         {
             switch (direction)
             {

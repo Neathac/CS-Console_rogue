@@ -16,7 +16,9 @@ namespace ConsoleRogue.Customizables
         public static RLColor inventoryColor = Pallete.SecondaryDark;
         public static RLColor messageColor = RLColor.Gray;
         public static RLColor statsColor = Pallete.TerciaryDarkLight;
-
+        public static RLColor healthBarLight = Pallete.Primary;
+        public static RLColor healthBarDark = Pallete.PrimaryDark;
+        public static RLColor pickupColor = Pallete.TerciaryLight;
         // Map elements
         public static RLColor wallVisible = Pallete.PrimaryLight;
         public static RLColor floorVisible = Pallete.SecondaryLight;
@@ -24,6 +26,7 @@ namespace ConsoleRogue.Customizables
         public static RLColor floorInvisible = Pallete.SecondaryDark;
 
         public static RLColor player = Pallete.Complementary;
+        public static RLColor enemy = Pallete.TerciaryDark;
 
     }
 }

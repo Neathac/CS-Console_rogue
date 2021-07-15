@@ -1,4 +1,5 @@
-﻿using ConsoleRogue.Misc_Globals;
+﻿using ConsoleRogue.Components.Actors;
+using ConsoleRogue.Misc_Globals;
 using RogueSharp;
 using System;
 using System.Collections.Generic;
@@ -13,23 +14,31 @@ namespace ConsoleRogue.Components.Map
         private readonly int minRooms;
         private readonly int maxRooms;
         private readonly Tileset tileset;
-
+        private List<Goblin> goblinList;
+        private List<Actors.Pack> packList;
         private List<Room> rooms;
+        private bool placedExit;
 
         public Generator( int width, int height, int minRooms, int maxRooms )
         {
+            placedExit = false;
             this.height = height;
             this.width = width;
             this.minRooms = minRooms;
             this.maxRooms = maxRooms;
             tileset = new Tileset();
             rooms = new List<Room>();
+            goblinList = new List<Goblin>();
+            packList = new List<Actors.Pack>();
         }
 
-        public Tileset generateMap( Random seed )
+        public Tileset generateMap( Random seed, int level )
         {
             bool placedPlayer = false;
+            Room playerRoom = new Room(1,1,1,1);
+            packList.Clear();
             rooms.Clear();
+            goblinList.Clear();
             // RogueSharp Initialize
             tileset.Initialize( width, height );
 
@@ -61,6 +70,12 @@ namespace ConsoleRogue.Components.Map
                     {
                         Program.player.setStart(currRoom.centerX, currRoom.centerY);
                         placedPlayer = true;
+                        playerRoom = currRoom;
+                    }
+                    else
+                    {
+                        goblinList = createEnemies(currRoom.centerX, currRoom.centerY, level, goblinList, playerRoom);
+                        packList = placePack(currRoom.centerX, currRoom.centerY, packList);
                     }
                 }
                 else
@@ -73,13 +88,55 @@ namespace ConsoleRogue.Components.Map
             return tileset;
         }
 
+        public List<Actors.Pack> placePack(int x, int y, List<Actors.Pack> packs)
+        {
+            if (placedExit)
+            {
+                Random random = new Random();
+                switch (random.Next(1, minRooms + 3))
+                {
+                    case 2:
+                        Actors.Pack pack = new Actors.Pack(x,y, Misc_Globals.Pack.AGILITY);
+                        packs.Add(pack);
+                        return packs;
+                    case 3:
+                        Actors.Pack pack2 = new Actors.Pack(x, y, Misc_Globals.Pack.ATTACK);
+                        packs.Add(pack2);
+                        return packs;
+                    case 4:
+                        Actors.Pack pack3 = new Actors.Pack(x, y, Misc_Globals.Pack.DEFENSE);
+                        packs.Add(pack3);
+                        return packs;
+                    case 5:
+                        Actors.Pack pack4 = new Actors.Pack(x, y, Misc_Globals.Pack.HEALTH);
+                        packs.Add(pack4);
+                        return packs;
+                    default:                       
+                        
+                        return packs;
+                }               
+            }
+            tileset.exit = new Actors.Pack(x, y, Misc_Globals.Pack.EXIT);
+            placedExit = true;
+            return packs;
+        }
+        public List<Actors.Pack> getPacks()
+        {
+            return packList;
+        }
+
+        public List<Goblin> getGoblins()
+        {
+            return goblinList;
+        }
+
         private void connectAllRooms(List<Room> rooms)
         {
             for(int i = 0; i < rooms.Count; ++i)
             {
                 for (int j = i+1; j < rooms.Count; ++j)
                 {
-                    connectTwoRooms(rooms[i], rooms[j], getRelativeDirs(new int[] { rooms[i].centerX, rooms[i].centerY }, new int[] { rooms[j].centerX, rooms[j].centerY }));
+                    connectTwoRooms(rooms[i], rooms[j], tileset.getRelativeDirs(new int[] { rooms[i].centerX, rooms[i].centerY }, new int[] { rooms[j].centerX, rooms[j].centerY }));
                 }
             }
         }
@@ -144,55 +201,6 @@ namespace ConsoleRogue.Components.Map
             }
         }
 
-        private MovementDirs getRelativeDirs(int[] x, int[] y)
-        {
-            if (x[0] > y[0]) // x is to the right of y
-            {
-                if (x[1] > y[1]) // x is below y
-                {
-                    return MovementDirs.DownRight;
-                }
-                else if (x[1] == y[1]) // x is on the same vertical line as y
-                {
-                    return MovementDirs.Right;
-                }
-                else // x is above y
-                {
-                    return MovementDirs.TopRight;
-                }
-            }
-            else if (x[0] == y[0]) // x and y are on the same horizontal level
-            {
-                if (x[1] > y[1]) // x is below y
-                {
-                    return MovementDirs.Down;
-                }
-                else if (x[1] == y[1]) // x is on the same vertical line as y
-                {
-                    return MovementDirs.InPlace;
-                }
-                else // x is above y
-                {
-                    return MovementDirs.Top;
-                }
-            }
-            else // x is to the left of y
-            {
-                if (x[1] > y[1]) // x is below y
-                {
-                    return MovementDirs.DownLeft;
-                }
-                else if (x[1] == y[1]) // x is on the same vertical line as y
-                {
-                    return MovementDirs.Left;
-                }
-                else // x is above y
-                {
-                    return MovementDirs.TopLeft;
-                }
-            }
-        }
-
         private void createRoom(Room room)
         {
             {
@@ -208,6 +216,26 @@ namespace ConsoleRogue.Components.Map
                     tileset.SetCellProperties(room.rightEdge, room.topEdge + i, false, false, false);
                 }
             }
+        }
+
+        private List<Goblin> createEnemies(int centerX, int centerY, int level, List<Goblin> goblins, Room playerRoom)
+        {
+            if(Math.Abs(centerX-playerRoom.centerX)>=4 && Math.Abs(centerY - playerRoom.centerY) >= 4)
+            {
+                for(int i = -1; i <= 1; i +=2)
+                {
+                    for (int j = -1; j <= 1; j += 2)
+                    {
+                        if (tileset.GetCell(centerX + i, centerY + j).IsWalkable)
+                        {
+                            Goblin goblin = new Goblin(level, centerX + i, centerY + j);
+                            goblins.Add(goblin);
+                        }
+                    }
+                }
+            }
+            
+            return goblins;
         }
 
         private bool isValid( Room room )

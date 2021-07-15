@@ -10,7 +10,7 @@ namespace ConsoleRogue.Components.Drivers
 {
     class MovementDriver
     {
-        public bool movePlayer( Player player ,MovementDirs direction )
+        public bool movePlayer( Actor player ,MovementDirs direction )
         {
             switch (direction)
             {
@@ -53,6 +53,143 @@ namespace ConsoleRogue.Components.Drivers
                     return MovementDirs.Right;
                 default:
                     return MovementDirs.InPlace;
+            }
+        }
+
+        public bool goblinAction(Goblin goblin, Player player, Tileset tileset)
+        {
+            if (goblin.toMove(player.agility))
+            {
+                switch(tileset.getRelativeDirs(new int[] { player.xCoor, player.yCoor }, new int[] { goblin.xCoor, goblin.yCoor }))
+                {
+                    case MovementDirs.Down:
+                        if(areAdjecent(goblin, player, MovementDirs.Down))
+                        {
+                            return true;
+                        }
+                        movePlayer(goblin, MovementDirs.Down);
+                        return false;
+                    case MovementDirs.Top:
+                        if (areAdjecent(goblin, player, MovementDirs.Top))
+                        {
+                            return true;
+                        }
+                        movePlayer(goblin, MovementDirs.Top);
+                        return false;
+                    case MovementDirs.Left:
+                        if (areAdjecent(goblin, player, MovementDirs.Left))
+                        {
+                            return true;
+                        }
+                        movePlayer(goblin, MovementDirs.Left);
+                        return false;
+                    case MovementDirs.Right:
+                        if (areAdjecent(goblin, player, MovementDirs.Right))
+                        {
+                            return true;
+                        }
+                        movePlayer(goblin, MovementDirs.Right);
+                        return false;
+                    case MovementDirs.DownLeft:
+                        if(goblin.health % 2 == 0)
+                        {
+                            if (movePlayer(goblin, MovementDirs.Left))
+                            {
+                                return false;
+                            }
+                            movePlayer(goblin, MovementDirs.Down);
+                            return false;
+                        }
+                        if (movePlayer(goblin, MovementDirs.Down))
+                        {
+                            return false;
+                        }
+                        movePlayer(goblin, MovementDirs.Left);
+                        return false;
+                    case MovementDirs.DownRight:
+                        if (goblin.health % 2 == 0)
+                        {
+                            if (movePlayer(goblin, MovementDirs.Right))
+                            {
+                                return false;
+                            }
+                            movePlayer(goblin, MovementDirs.Down);
+                            return false;
+                        }
+                        if (movePlayer(goblin, MovementDirs.Down))
+                        {
+                            return false;
+                        }
+                        movePlayer(goblin, MovementDirs.Right);
+                        return false;
+                    case MovementDirs.TopLeft:
+                        if (goblin.health % 2 == 0)
+                        {
+                            if (movePlayer(goblin, MovementDirs.Left))
+                            {
+                                return false;
+                            }
+                            movePlayer(goblin, MovementDirs.Top);
+                            return false;
+                        }
+                        if (movePlayer(goblin, MovementDirs.Top))
+                        {
+                            return false;
+                        }
+                        movePlayer(goblin, MovementDirs.Left);
+                        return false;
+                    case MovementDirs.TopRight:
+                        if (goblin.health % 2 == 0)
+                        {
+                            if (movePlayer(goblin, MovementDirs.Right))
+                            {
+                                return false;
+                            }
+                            movePlayer(goblin, MovementDirs.Top);
+                            return false;
+                        }
+                        if (movePlayer(goblin, MovementDirs.Top))
+                        {
+                            return false;
+                        }
+                        movePlayer(goblin, MovementDirs.Right);
+                        return false;
+
+                }
+            }
+            return false;
+        }
+
+        public bool areAdjecent(Actor actor1, Actor actor2, MovementDirs direction)
+        {
+            switch (direction)
+            {
+                case MovementDirs.Down:
+                    if (actor1.yCoor + 1 == actor2.yCoor)
+                    {
+                        return true;
+                    }
+                    return false;
+                case MovementDirs.Top:
+                    if (actor1.yCoor - 1 == actor2.yCoor)
+                    {
+                        return true;
+                    }
+                    return false;
+                case MovementDirs.Right:
+                    if (actor1.xCoor + 1 == actor2.xCoor)
+                    {
+                        return true;
+                    }
+                    return false;
+                case MovementDirs.Left:
+                    if (actor1.xCoor - 1 == actor2.xCoor)
+                    {
+                        return true;
+                    }
+                    return false;
+                default:
+                    return false;
             }
         }
     }
