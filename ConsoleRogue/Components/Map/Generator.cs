@@ -220,7 +220,7 @@ namespace ConsoleRogue.Components.Map
 
         private List<Goblin> createEnemies(int centerX, int centerY, int level, List<Goblin> goblins, Room playerRoom)
         {
-            if(Math.Abs(centerX-playerRoom.centerX)<=4 && Math.Abs(centerY - playerRoom.centerY) <= 4)
+            if(Math.Abs(centerX-playerRoom.centerX)>=4 && Math.Abs(centerY - playerRoom.centerY) >= 4)
             {
                 for(int i = -1; i <= 1; i +=2)
                 {

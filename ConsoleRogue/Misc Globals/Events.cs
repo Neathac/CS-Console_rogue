@@ -11,6 +11,7 @@ namespace ConsoleRogue.Misc_Globals
         Moved,
         Found,
         Destroyed,
-        Nothing
+        Nothing,
+        Exit
     }
 }

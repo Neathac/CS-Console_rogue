@@ -31,6 +31,11 @@ namespace ConsoleRogue.Customizables
             return (destroyed + killed.name);
         }
 
+        public static string getExit()
+        {
+            return (found + "an exit");
+        }
+
         public static string getFound(Misc_Globals.Pack pack)
         {
             switch (pack)

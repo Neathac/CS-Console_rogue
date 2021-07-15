@@ -36,6 +36,7 @@ namespace ConsoleRogue
         private static readonly int inventoryHeight = 11;
         private static RLConsole inventoryConsole;
         private static bool reRender = true;
+        private static int level = 1;
 
         public static Tileset tileset { get; set; }
 
@@ -60,12 +61,7 @@ namespace ConsoleRogue
             statConsole = new RLConsole(statWidth, statHeight);
             inventoryConsole = new RLConsole(inventoryWidth, inventoryHeight);
 
-            Generator generator = new Generator( mapWidth, mapHeight, 5, 25);
-            int numSeed = Environment.TickCount;
-            Random seed = new Random(numSeed);
-            tileset = generator.generateMap(seed, 1);
-            tileset.setGoblins(generator.getGoblins());
-            tileset.setPacks(generator.getPacks());
+            tileset = newLevel();
 
             mapConsole.SetBackColor(0, 0, mapWidth, mapHeight, ObjectColoring.background);
 
@@ -84,6 +80,18 @@ namespace ConsoleRogue
             rootConsole.Run();
         }
 
+        private static Tileset newLevel()
+        {
+            Generator generator = new Generator(mapWidth, mapHeight, 5, 25);
+            int numSeed = Environment.TickCount;
+            Random seed = new Random(numSeed);
+            tileset = generator.generateMap(seed, level);
+            tileset.setGoblins(generator.getGoblins());
+            tileset.setPacks(generator.getPacks());
+            ++level;
+            return tileset;
+        }
+
         private static void onRootConsoleUpdate( object sender, UpdateEventArgs e)
         {
             RLKeyPress key = rootConsole.Keyboard.GetKeyPress();
@@ -95,7 +103,10 @@ namespace ConsoleRogue
                     if (!entity.Equals(player))
                     {
                         reRender = true;
-                        Statistics.playerAction(player, entity, tileset, messenger);
+                        if(Statistics.playerAction(player, entity, tileset, messenger) == Events.Exit)
+                        {
+                            tileset = newLevel();
+                        }
                         messenger.Draw(messageConsole);
                         messageConsole.SetBackColor(0, 0, messageWidth, messageHeight, ObjectColoring.messageColor);
                         player.drawStats(statConsole);

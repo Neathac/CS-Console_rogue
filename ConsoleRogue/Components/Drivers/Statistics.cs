@@ -70,6 +70,9 @@ namespace ConsoleRogue.Components.Drivers
                         player.health = player.maxHealth;
                         tileset.removePack(target as Actors.Pack);
                         break;
+                    case Misc_Globals.Pack.EXIT:
+                        messenger.Add(Messages.getExit());
+                        return Events.Exit;
                     default:                        
                         break;
                 }

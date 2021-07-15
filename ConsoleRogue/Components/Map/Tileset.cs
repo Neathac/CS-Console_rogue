@@ -156,6 +156,13 @@ namespace ConsoleRogue.Components.Map
                     }
                 }
             }
+            if(IsInFov(exit.xCoor, exit.yCoor))
+            {
+                if (Math.Abs(exit.yCoor - actor.yCoor) <= 2 && Math.Abs(exit.xCoor - actor.xCoor) <= 2)
+                {
+                    return exit;
+                }
+            }
             return actor;
         }
 
